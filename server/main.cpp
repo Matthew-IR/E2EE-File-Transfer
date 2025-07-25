@@ -34,30 +34,38 @@ int main() {
         exit(EXIT_FAILURE);
     };
 
-    // Accept a connection
-    int clientSocket = accept(serverSocket, nullptr, nullptr);
-    if (clientSocket == -1) {
-        std::cerr << "accept error" << std::endl;
-        close(serverSocket);
-        exit(EXIT_FAILURE);
-    }
+    while (true) {
 
-    //Receive and Send data
-    char buffer[1024] = {0};
-    ssize_t bytes = recv(clientSocket, buffer, sizeof(buffer), 0);
+        // Accept a connection
+        int clientSocket = accept(serverSocket, nullptr, nullptr);
+        if (clientSocket == -1) {
+            std::cerr << "accept error" << std::endl;
+            close(serverSocket);
+            exit(EXIT_FAILURE);
+        }
 
-    if (bytes == -1) {
-        std::cout << "recv failed " << std::endl;
-    } else if (bytes == 0) {
+        //Receive and Send data
+        char buffer[1024] = {0};
+        ssize_t bytes = recv(clientSocket, buffer, sizeof(buffer), 0);
+
+        if (bytes == -1) {
+            std::cout << "recv failed " << std::endl;
+        } else if (bytes == 0) {
+            std::cout << "client disconnect" << std::endl;
+        } else {
+            std::cout << "Message from client: " << buffer << std::endl;
+        }
+
+        close(clientSocket);
         std::cout << "client disconnect" << std::endl;
-    } else {
-        std::cout << "Message from client: " << buffer << std::endl;
     }
+
+
+
     
 
     // Close the sockets
 
     close(serverSocket);
-    close(clientSocket);
     return 0;
 }
