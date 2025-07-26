@@ -4,6 +4,9 @@
 #include <unistd.h>
 #include <cstring>
 #include <netdb.h> 
+#include <vector>
+
+#include "key_exchange.h"
 
 int main(int argc, char const* argv[]) {
 
@@ -14,6 +17,11 @@ int main(int argc, char const* argv[]) {
 
     const char* server_hostname = argv[1];
     struct hostent *server = gethostbyname(server_hostname);
+
+
+    prove_build();
+
+
 
     if (server == NULL) {
         std::cout << "No host: " << server_hostname << std::endl;
