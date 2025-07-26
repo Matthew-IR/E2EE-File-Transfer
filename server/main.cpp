@@ -3,7 +3,8 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <string>
-
+#include <vector>
+#include <fstream>
 
 int main() {
 
@@ -44,16 +45,30 @@ int main() {
             exit(EXIT_FAILURE);
         }
 
+        // File to save the data
+        std::ofstream file("incoming_file", std::ios::binary);
+        
+
+
+
         //Receive and Send data
-        char buffer[1024] = {0};
-        ssize_t bytes = recv(clientSocket, buffer, sizeof(buffer), 0);
+        
+        const size_t BUFFER_SIZE = 4096;
+        std::vector<char> buffer(BUFFER_SIZE);
+
+        ssize_t bytes;
+
+        while ((bytes = recv(clientSocket, buffer.data(), buffer.size(), 0)) > 0) {
+            std::fill(buffer.begin() + bytes, buffer.end(), 0);
+            file.write(buffer.data(), bytes);
+        }
 
         if (bytes == -1) {
             std::cout << "recv failed " << std::endl;
         } else if (bytes == 0) {
             std::cout << "client disconnect" << std::endl;
         } else {
-            std::cout << "Message from client: " << buffer << std::endl;
+            std::cout << "Message from client: " << buffer.data() << std::endl;
         }
 
         close(clientSocket);

@@ -3,10 +3,41 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <cstring>
+#include <string>
 #include <netdb.h> 
 #include <vector>
+#include <fstream>
 
 #include "key_exchange.h"
+
+int send_file(int socket, const std::string& filepath) {
+    
+    std::ifstream file(filepath, std::ios::binary);
+
+    if (!file.is_open()) {
+        std::cout << "Error opening file" << std::endl;
+        return -1;
+    }
+
+    const size_t BUFFER_SIZE = 4096;
+    std::vector<char> buffer(BUFFER_SIZE);
+
+    while (file) {
+
+        file.read(buffer.data(), buffer.size());
+        std::streamsize bytes_read = file.gcount();
+
+        if (bytes_read > 0) {
+
+            if (bytes_read < buffer.size()) {
+                std::fill(buffer.begin() + bytes_read, buffer.end(), 0);
+            }
+
+            send(socket, buffer.data(), bytes_read, 0);
+        }
+
+    }
+}
 
 int main(int argc, char const* argv[]) {
 
@@ -17,11 +48,6 @@ int main(int argc, char const* argv[]) {
 
     const char* server_hostname = argv[1];
     struct hostent *server = gethostbyname(server_hostname);
-
-
-    prove_build();
-
-
 
     if (server == NULL) {
         std::cout << "No host: " << server_hostname << std::endl;
@@ -48,13 +74,8 @@ int main(int argc, char const* argv[]) {
 
     std::cerr << "Connected to: " << server_hostname << std::endl;
 
-    const char* message = "Hello, server!";
+    send_file(clientSocket, argv[2]);
 
-    if(send(clientSocket, message, strlen(message), 0) < 0) {
-        std::cerr << "error sending message" << std::endl;
-    } else {
-        std::cerr << "message sent: " << message << std::endl;
-    };
 
     close(clientSocket);
 
