@@ -7,8 +7,17 @@
 #include <netdb.h> 
 #include <vector>
 #include <fstream>
+#include <cstdint>
+#include <filesystem>
 
 #include "key_exchange.h"
+
+
+struct file_header {
+    std::string filename;
+    uint64_t file_size;
+};
+
 
 int send_file(int socket, const std::string& filepath) {
     
@@ -18,6 +27,25 @@ int send_file(int socket, const std::string& filepath) {
         std::cout << "Error opening file" << std::endl;
         return -1;
     }
+
+    file_header header;
+    header.file_size = std::filesystem::file_size(filepath);
+    header.filename = std::filesystem::path(filepath).filename().string();
+
+    // std::cout << "name: " << header.filename << " size: " << header.file_size << std::endl;
+
+    // Send filename length
+    uint16_t name_length = header.filename.size();
+    std::cout << "name length:  " << name_length << std::endl;
+    send(socket, &name_length, sizeof(name_length), 0);
+
+    // Send filename
+    std::cout << "filename:  " << header.filename.c_str() << std::endl;
+    send(socket, header.filename.c_str(), name_length, 0);
+
+    // Send filesize
+    std::cout << "filesize:  " << header.file_size << std::endl;
+    send(socket, &header.file_size, sizeof(header.file_size), 0);
 
     const size_t BUFFER_SIZE = 4096;
     std::vector<char> buffer(BUFFER_SIZE);

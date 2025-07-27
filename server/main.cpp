@@ -45,8 +45,29 @@ int main() {
             exit(EXIT_FAILURE);
         }
 
+        // Recieve filename length
+        uint16_t name_length;
+        recv(clientSocket, &name_length, sizeof(name_length), 0);
+
+
+        std::cout << "name length:  " << name_length << std::endl;
+        // Recieve filename
+
+        // char filename_buffer[name_length];
+        std::vector<char> filename_buffer(name_length);
+        recv(clientSocket, filename_buffer.data(), name_length, 0);
+
+        std::string filename(filename_buffer.begin(), filename_buffer.end());
+        std::cout << "filename:  " << filename << std::endl;
+
+        // Recieve filesize
+        uint64_t filesize;
+        recv(clientSocket, &filesize, sizeof(uint64_t), 0);
+        std::cout << "filesize:  " << filesize << std::endl;
+
         // File to save the data
-        std::ofstream file("incoming_file", std::ios::binary);
+
+        std::ofstream file(filename, std::ios::binary);
         
 
 
