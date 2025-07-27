@@ -1,7 +1,7 @@
 CXX = g++
 CXXFLAGS = -std=c++17 -Wall
 
-SRCS = main.cpp key_exchange.cpp
+SRCS = main.cpp key_exchange.cpp ../common/file_transfer.cpp
 TARGET = client
 
 all: $(TARGET)

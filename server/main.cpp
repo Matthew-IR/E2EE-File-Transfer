@@ -6,6 +6,9 @@
 #include <vector>
 #include <fstream>
 
+#include "../common/shared.h"
+#include "../common/file_transfer.h"
+
 int main() {
 
     // Create a socket
@@ -18,7 +21,7 @@ int main() {
     // Define the server address
     sockaddr_in serverAddress;
     serverAddress.sin_family = AF_INET;
-    serverAddress.sin_port = htons(8080);
+    serverAddress.sin_port = htons(PORT);
     serverAddress.sin_addr.s_addr = INADDR_ANY;
     
     // Bind the socket to IP and port
@@ -45,52 +48,11 @@ int main() {
             exit(EXIT_FAILURE);
         }
 
-        // Recieve filename length
-        uint16_t name_length;
-        recv(clientSocket, &name_length, sizeof(name_length), 0);
-
-
-        std::cout << "name length:  " << name_length << std::endl;
-        // Recieve filename
-
-        // char filename_buffer[name_length];
-        std::vector<char> filename_buffer(name_length);
-        recv(clientSocket, filename_buffer.data(), name_length, 0);
-
-        std::string filename(filename_buffer.begin(), filename_buffer.end());
-        std::cout << "filename:  " << filename << std::endl;
-
-        // Recieve filesize
-        uint64_t filesize;
-        recv(clientSocket, &filesize, sizeof(uint64_t), 0);
-        std::cout << "filesize:  " << filesize << std::endl;
-
-        // File to save the data
-
-        std::ofstream file(filename, std::ios::binary);
-        
-
-
-
-        //Receive and Send data
-        
-        const size_t BUFFER_SIZE = 4096;
-        std::vector<char> buffer(BUFFER_SIZE);
-
-        ssize_t bytes;
-
-        while ((bytes = recv(clientSocket, buffer.data(), buffer.size(), 0)) > 0) {
-            std::fill(buffer.begin() + bytes, buffer.end(), 0);
-            file.write(buffer.data(), bytes);
-        }
-
-        if (bytes == -1) {
-            std::cout << "recv failed " << std::endl;
-        } else if (bytes == 0) {
-            std::cout << "client disconnect" << std::endl;
+        if (receive_file(clientSocket, "test").empty()) {
+            std::cerr << "File receive failed" << std::endl;
         } else {
-            std::cout << "Message from client: " << buffer.data() << std::endl;
-        }
+            std::cout << "Transfer complete" << std::endl;
+        };
 
         close(clientSocket);
         std::cout << "client disconnect" << std::endl;

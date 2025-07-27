@@ -11,61 +11,8 @@
 #include <filesystem>
 
 #include "key_exchange.h"
-
-
-struct file_header {
-    std::string filename;
-    uint64_t file_size;
-};
-
-
-int send_file(int socket, const std::string& filepath) {
-    
-    std::ifstream file(filepath, std::ios::binary);
-
-    if (!file.is_open()) {
-        std::cout << "Error opening file" << std::endl;
-        return -1;
-    }
-
-    file_header header;
-    header.file_size = std::filesystem::file_size(filepath);
-    header.filename = std::filesystem::path(filepath).filename().string();
-
-    // std::cout << "name: " << header.filename << " size: " << header.file_size << std::endl;
-
-    // Send filename length
-    uint16_t name_length = header.filename.size();
-    std::cout << "name length:  " << name_length << std::endl;
-    send(socket, &name_length, sizeof(name_length), 0);
-
-    // Send filename
-    std::cout << "filename:  " << header.filename.c_str() << std::endl;
-    send(socket, header.filename.c_str(), name_length, 0);
-
-    // Send filesize
-    std::cout << "filesize:  " << header.file_size << std::endl;
-    send(socket, &header.file_size, sizeof(header.file_size), 0);
-
-    const size_t BUFFER_SIZE = 4096;
-    std::vector<char> buffer(BUFFER_SIZE);
-
-    while (file) {
-
-        file.read(buffer.data(), buffer.size());
-        std::streamsize bytes_read = file.gcount();
-
-        if (bytes_read > 0) {
-
-            if (bytes_read < buffer.size()) {
-                std::fill(buffer.begin() + bytes_read, buffer.end(), 0);
-            }
-
-            send(socket, buffer.data(), bytes_read, 0);
-        }
-
-    }
-}
+#include "../common/shared.h"
+#include "../common/file_transfer.h"
 
 int main(int argc, char const* argv[]) {
 
@@ -90,7 +37,7 @@ int main(int argc, char const* argv[]) {
 
     sockaddr_in serverAddress;
     serverAddress.sin_family = AF_INET;
-    serverAddress.sin_port = htons(8080);
+    serverAddress.sin_port = htons(PORT);
 
     memcpy(&serverAddress.sin_addr.s_addr, server->h_addr, server->h_length);
 
