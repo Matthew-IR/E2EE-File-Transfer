@@ -2,7 +2,7 @@ CXX = g++
 CXXFLAGS = -std=c++17 -Wall
 
 SRCS = main.cpp key_exchange.cpp
-TARGET = client.o
+TARGET = client
 
 all: $(TARGET)
 

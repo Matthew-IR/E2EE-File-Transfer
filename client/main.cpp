@@ -69,8 +69,8 @@ int send_file(int socket, const std::string& filepath) {
 
 int main(int argc, char const* argv[]) {
 
-    if (argc < 2) {
-        std::cout << "Usage: " << argv[0] << " <hostname>\n" << std::endl;
+    if (argc < 3) {
+        std::cout << "Usage: " << argv[0] << " <hostname> <filepath>\n" << std::endl;
         exit(EXIT_FAILURE);
     };
 

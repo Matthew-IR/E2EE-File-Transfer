@@ -2,7 +2,7 @@ CXX = g++
 CXXFLAGS = -std=c++17 -Wall
 
 SRCS = main.cpp
-TARGET = server.o
+TARGET = server
 
 all: $(TARGET)
 
