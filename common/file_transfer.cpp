@@ -94,10 +94,19 @@ std::string receive_file(int socket, const std::string& output_dir) {
         return "";
     };
 
+    // create directory
+    try {
+        std::filesystem::create_directories(output_dir);
+    } catch (const std::filesystem::filesystem_error& err) {
+        std::cerr << "Failed to create directory: " << err.what() << std::endl;
+        return "";
+    };
+
+    std::filesystem::path path = output_dir;
+    path /= filename;
+
     // File to save the data
-
-
-    std::ofstream file(filename, std::ios::binary);
+    std::ofstream file(path, std::ios::binary);
     if (!file.is_open()) {
         std::cerr << "Failed to open output file: " << strerror(errno) << std::endl;
         return "";

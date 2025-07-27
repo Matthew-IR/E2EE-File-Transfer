@@ -48,7 +48,7 @@ int main() {
             exit(EXIT_FAILURE);
         }
 
-        if (receive_file(clientSocket, "test").empty()) {
+        if (receive_file(clientSocket, "received").empty()) {
             std::cerr << "File receive failed" << std::endl;
         } else {
             std::cout << "Transfer complete" << std::endl;
